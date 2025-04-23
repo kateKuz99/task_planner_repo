@@ -28,6 +28,12 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>io.minio</groupId>
+			<artifactId>minio</artifactId>
+			<version>8.5.0</version> <!-- Проверьте актуальную версию на момент разработки -->
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
@@ -151,6 +157,17 @@
 					<compilerArgs>
 						<arg>-parameters</arg>
 					</compilerArgs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>7.0.0</version>
+				<configuration>
+					<!-- URL для MySQL -->
+					<url>jdbc:mysql://localhost:3306/task-planner</url>
+					<user>root</user>
+					<password>katya1234</password>
 				</configuration>
 			</plugin>
 		</plugins>

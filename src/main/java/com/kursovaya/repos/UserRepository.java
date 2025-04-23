@@ -10,4 +10,6 @@ public interface UserRepository extends R2dbcRepository<UserEntity, Long> {
     Mono<UserEntity> findByActivationCode(String code);
 
     Mono<UserEntity> findByEmail(String userEmail);
+
+
 }

@@ -9,12 +9,18 @@ import com.kursovaya.security.SecurityService;
 import com.kursovaya.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import org.springframework.web.bind.annotation.RequestPart;
 
 @RestController
 @RequiredArgsConstructor
@@ -75,17 +81,44 @@ public class AuthController {
         return userService.updateUser(customPrincipal.getId(), userUpdateDto);
     }
 
-    @PostMapping("/auth/avatar")
+    @PostMapping(value = "/auth/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload user avatar")
     public Mono<UserDto> uploadAvatar(
-            @RequestPart("avatar") MultipartFile avatar,
+            @RequestPart("avatar") FilePart avatar,
             Authentication authentication) {
 
         CustomPrincipal customPrincipal = (CustomPrincipal) authentication.getPrincipal();
 
         return userService.uploadAvatar(customPrincipal.getId(), avatar)
-                .map(userMapper::toDto);
+                .map(userMapper::toDto)
+                .onErrorResume(e -> {
+                    e.printStackTrace();
+                    return Mono.error(new RuntimeException("Error uploading avatar", e));
+                });
     }
+
+    @GetMapping("/auth/avatar")
+    @Operation(summary = "Get user avatar")
+    public Mono<ResponseEntity<Resource>> getAvatar(Authentication authentication) {
+        CustomPrincipal customPrincipal = (CustomPrincipal) authentication.getPrincipal();
+
+        return userService.getAvatar(customPrincipal.getId())
+                .map(resource -> ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource))  // Возвращаем изображение
+                .defaultIfEmpty(ResponseEntity.notFound().build());  // Возвращаем 404, если аватар не найден
+    }
+
+    @DeleteMapping("/auth/{userId}")
+    @Operation(summary = "Delete user by ID (only for admins)")
+    public Mono<ResponseEntity<String>> deleteUser(@PathVariable Long userId) {
+        return userService.deleteUserById(userId)
+                .thenReturn(ResponseEntity.ok("User successfully deleted"))
+                .onErrorResume(e -> {
+                    e.printStackTrace();
+                    return Mono.just(ResponseEntity.internalServerError()
+                            .body("Error deleting user: " + e.getMessage()));
+                });
+    }
+
 
 
 }

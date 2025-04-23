@@ -3,6 +3,8 @@ package com.kursovaya.service;
 import com.kursovaya.dto.UserMainInfoDto;
 import com.kursovaya.dto.UserUpdateDto;
 import com.kursovaya.model.UserEntity;
+import org.springframework.core.io.Resource;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
@@ -23,6 +25,12 @@ public interface UserService {
 
     Mono<UserEntity> updateUser(Long userId, UserUpdateDto userUpdateDto);
 
-    public Mono<UserEntity> uploadAvatar(Long userId, MultipartFile avatar);
+     Mono<UserEntity> uploadAvatar(Long userId, FilePart filePart);
+
+     Mono<Resource> getAvatar(Long userId);
+
+
+
+    Mono<Void> deleteUserById(Long userId);
 
 }

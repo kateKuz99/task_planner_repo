@@ -3,13 +3,13 @@ server:
 
 spring:
   r2dbc:
-    url: r2dbc:mysql://root:katya1234@localhost:3307/task-planner
+    url: r2dbc:mysql://root:katya1234@localhost:3306/task-planner
     #url: r2dbc:pool:mysql://db:3307/task-planner
     username: root
     password: katya1234
   flyway:
     enabled: true
-    url: jdbc:mysql://root:katya1234@localhost:3307/task-planner
+    url: jdbc:mysql://root:katya1234@localhost:3306/task-planner
     #url: jdbc:mysql://root:root@db:3307/task-planner
     locations: classpath:db/migration
   servlet:
@@ -52,6 +52,7 @@ springdoc:
 logging:
   level:
     org.springdoc: DEBUG
+    org.springframework.web: DEBUG
 
 management:
   endpoints:
@@ -67,4 +68,3 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin
   bucket: avatars
-
